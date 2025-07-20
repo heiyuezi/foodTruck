@@ -5,7 +5,7 @@ class AboutScreen extends StatelessWidget {
   const AboutScreen({Key? key}) : super(key: key);
 
   void _launchURL() async {
-    final Uri url = Uri.parse("https://github.com/yourgroup/food-truck-app");
+    final Uri url = Uri.parse("https://github.com/heiyuezi/foodTruck");
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
