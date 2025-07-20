@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "872794794811",
+    "project_id": "foodtrucktrack-c225a",
+    "storage_bucket": "foodtrucktrack-c225a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:872794794811:android:254e165ed6386778e1e51e",
+        "android_client_info": {
+          "package_name": "com.example.food_truck_track_itt602"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7AHZn8c_1P7ptIDobFTXwf8NWSXNcIuQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
