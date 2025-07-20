@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Food Truck Admin</title>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <!-- Your CSS -->
+  <style>
+    /* Paste your provided CSS here */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff8e1;
+      color: #4e342e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .login-container {
+      background-color: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+      border: 3px solid #ffe0b2;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 25px;
+      background-color: #ef6c00;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: white;
+      box-shadow: 0 4px 15px rgba(239, 108, 0, 0.3);
+    }
+
+    .login-container h2 {
+      color: #e65100;
+      margin-bottom: 30px;
+      font-size: 1.8em;
+      font-weight: bold;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #e65100;
+      font-size: 14px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background-color: #fafafa;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #ef6c00;
+      background-color: white;
+      box-shadow: 0 0 0 3px rgba(239, 108, 0, 0.1);
+    }
+
+    .login-btn {
+      background-color: #ef6c00;
+      color: white;
+      padding: 14px 20px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(239, 108, 0, 0.3);
+    }
+
+    .login-btn:hover {
+      background-color: #e65100;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 108, 0, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .error-message {
+      background-color: #ffebee;
+      color: #c62828;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 15px;
+      font-size: 14px;
+      border: 1px solid #ffcdd2;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .success-message {
+      background-color: #e8f5e8;
+      color: #2e7d32;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 15px;
+      font-size: 14px;
+      border: 1px solid #c8e6c9;
+      display: none;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">🍔</div>
+    <h2>Admin Login</h2>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" required />
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" required />
+    </div>
+    <button class="login-btn" id="loginBtn">Login</button>
+    <div class="error-message" id="errorMessage"></div>
+  </div>
+
+  <script>
+    const loginBtn = document.getElementById("loginBtn");
+    const errorMessage = document.getElementById("errorMessage");
+
+    loginBtn.addEventListener("click", function () {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+firebase.auth().signInWithEmailAndPassword(email, password)
+  .then((userCredential) => {
+    window.location.href = "main.html";
+  })
+  .catch((error) => {
+    errorMessage.textContent = error.message;
+    errorMessage.classList.add("show");
+  });
+});
+
+// Optional: redirect to main if already logged in
+firebase.auth().onAuthStateChanged((user) => {
+if (user) window.location.href = "main.html";
+});
+</script>
+</body>
+</html>
