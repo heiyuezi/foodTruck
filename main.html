@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - Food Truck Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff8e1;
+      margin: 0;
+      padding: 30px;
+      color: #4e342e;
+    }
+
+    .dashboard-container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border: 2px solid #ffe0b2;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 1.8em;
+      color: #e65100;
+    }
+
+    p {
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #ef6c00;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      background: #fafafa;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #ef6c00;
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(239, 108, 0, 0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background-color: #ef6c00;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #e65100;
+    }
+
+    #statusMsg {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .logout-btn {
+      margin-top: 20px;
+      background-color: #d84315;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .logout-btn:hover {
+      background-color: #bf360c;
+    }
+
+    @media (max-width: 480px) {
+      .dashboard-container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <h1>🚚 Admin Dashboard</h1>
+    <p id="lastReport">Last Report: Loading...</p>
+    <p id="reportedBy">Reported By: Loading...</p>
+
+    <div class="form-group">
+      <label for="reporterName">Reported By</label>
+      <input type="text" id="reporterName" placeholder="e.g., Ari" required>
+    </div>
+
+    <form id="truckForm">
+      <div class="form-group">
+        <label for="name">Food Truck Type</label>
+        <input type="text" id="name" placeholder="e.g., Taco" required>
+      </div>
+
+      <div class="form-group">
+        <label for="locationDesc">Location Description</label>
+        <input type="text" id="locationDesc" placeholder="e.g., Near Central Park" required>
+      </div>
+
+      <div class="form-group">
+        <label for="latitude">Latitude</label>
+        <input type="number" step="any" id="latitude" required>
+      </div>
+
+      <div class="form-group">
+        <label for="longitude">Longitude</label>
+        <input type="number" step="any" id="longitude" required>
+      </div>
+
+      <button type="submit">Report Food Truck Info</button>
+    </form>
+
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+    <div id="statusMsg"></div>
+  </div>
+
+  <script>
+    const lastReportEl = document.getElementById("lastReport");
+    const reportedByEl = document.getElementById("reportedBy");
+    const statusMsg = document.getElementById("statusMsg");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const db = firebase.database();
+
+    // Auth check
+    firebase.auth().onAuthStateChanged((user) => {
+      if (!user) {
+        window.location.href = "index.html";
+      } else {
+        db.ref('adminUpdates/currentTruck').on('value', (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            lastReportEl.textContent = "Last Report: " + new Date(data.lastReported).toLocaleString();
+            reportedByEl.textContent = "Reported By: " + (data.reportedBy || "Unknown");
+          } else {
+            lastReportEl.textContent = "Last Report: Not available";
+            reportedByEl.textContent = "Reported By: Not available";
+          }
+        });
+      }
+    });
+
+    // Form submission
+    document.getElementById("truckForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const user = firebase.auth().currentUser;
+      if (!user) {
+        alert("User not authenticated.");
+        return;
+      }
+
+      const truckData = {
+        name: document.getElementById("name").value.trim(),
+        type: document.getElementById("name").value.trim(), // Add "type"
+        locationDesc: document.getElementById("locationDesc").value.trim(),
+        latitude: parseFloat(document.getElementById("latitude").value),
+        longitude: parseFloat(document.getElementById("longitude").value),
+        updatedAt: new Date().toISOString(),
+        lastReported: Date.now(),
+        reportedBy: document.getElementById("reporterName").value.trim()
+      };
+
+      // ✅ Save to adminUpdates/currentTruck
+      db.ref("adminUpdates/currentTruck").set(truckData);
+
+      // ✅ Push to foodtrucks (for Flutter markers)
+      db.ref("foodtrucks").push(truckData)
+        .then(() => {
+          statusMsg.textContent = "✅ Truck info updated and saved!";
+          statusMsg.style.color = "green";
+          document.getElementById("truckForm").reset();
+        })
+        .catch((err) => {
+          statusMsg.textContent = "❌ Error: " + err.message;
+          statusMsg.style.color = "red";
+        });
+    });
+
+    // Logout
+    logoutBtn.addEventListener("click", () => {
+      firebase.auth().signOut().then(() => {
+        window.location.href = "index.html";
+      });
+    });
+  </script>
+</body>
+</html>
